@@ -2,13 +2,12 @@
 
 import { useState } from 'react'
 import { updateCheckup, updateResult, verifyCheckup, deleteCheckup } from '@/app/actions/checkup'
-import { CheckCircle2, AlertTriangle, Save, ArrowLeft, Trash2 } from 'lucide-react'
+import { CheckCircle2, AlertTriangle, Save, ArrowLeft, Trash2, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-
-// ... existing code ...
-
-
+import { getDefinition } from '@/lib/glossary'
+import { Tooltip } from '@/components/ui/tooltip'
+import { ConfirmModal } from '@/components/ui/modal'
 
 interface Props {
     checkup: any
@@ -21,17 +20,20 @@ export default function CheckupReviewForm({ checkup, results: initialResults }: 
     const [isSaving, setIsSaving] = useState(false)
     const [isDeleting, setIsDeleting] = useState(false)
 
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
+
     const handleDelete = async () => {
-        if (!confirm("Are you sure you want to delete this checkup? This cannot be undone.")) return
+        // if (!confirm("Are you sure you want to delete this checkup? This cannot be undone.")) return
 
         setIsDeleting(true)
-        await deleteCheckup(checkup.id)
-        router.push('/')
+        try {
+            await deleteCheckup(checkup.id)
+            router.push('/')
+        } catch (error) {
+            console.error(error);
+            setIsDeleting(false);
+        }
     }
-
-    // We can manage local state for results or just rely on server actions + standard inputs
-    // For simplicity MVP, we'll use individual form action handlers or simple onBlur updates.
-    // Review Mode: Highlight warnings.
 
     const flags = checkup.flags || []
     const isFlagged = flags.length > 0 || checkup.status === 'needs_review'
@@ -90,15 +92,23 @@ export default function CheckupReviewForm({ checkup, results: initialResults }: 
                         {initialResults.map(result => {
                             const resultFlags = result.flags || []
                             const hasIssue = resultFlags.length > 0
+                            const definition = getDefinition(result.marker_name)
 
                             return (
                                 <tr key={result.id} className={hasIssue ? "bg-yellow-50/50" : ""}>
                                     <td className="px-6 py-4 font-medium">
-                                        <input
-                                            defaultValue={result.marker_name}
-                                            onBlur={(e) => updateResult(result.id, { marker_name: e.target.value, checkup_id: checkup.id })}
-                                            className="bg-transparent border-b border-transparent focus:border-blue-300 focus:outline-none w-full"
-                                        />
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                defaultValue={result.marker_name}
+                                                onBlur={(e) => updateResult(result.id, { marker_name: e.target.value, checkup_id: checkup.id })}
+                                                className="bg-transparent border-b border-transparent focus:border-blue-300 focus:outline-none w-full"
+                                            />
+                                            {definition && (
+                                                <Tooltip content={definition}>
+                                                    <Info className="w-4 h-4 text-blue-400 hover:text-blue-600 cursor-help transition-colors" />
+                                                </Tooltip>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-2">
@@ -135,10 +145,9 @@ export default function CheckupReviewForm({ checkup, results: initialResults }: 
             </div>
 
             {/* Actions */}
-            {/* Actions */}
             <div className="flex items-center justify-between p-4">
                 <button
-                    onClick={handleDelete}
+                    onClick={() => setShowDeleteModal(true)}
                     disabled={isDeleting || isSaving}
                     className="text-red-500 hover:text-red-700 text-sm font-medium flex items-center gap-2 px-4 py-2 hover:bg-red-50 rounded-lg transition-colors"
                 >
@@ -160,6 +169,17 @@ export default function CheckupReviewForm({ checkup, results: initialResults }: 
                     </button>
                 </div>
             </div>
+
+            <ConfirmModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={handleDelete}
+                title="Delete Checkup"
+                description="Are you sure you want to delete this checkup? This action cannot be undone and all associated data will be removed."
+                confirmText="Delete Checkup"
+                variant="destructive"
+                isLoading={isDeleting}
+            />
         </div>
     )
 }

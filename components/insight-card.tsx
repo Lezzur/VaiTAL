@@ -10,9 +10,7 @@ export default function InsightCard({ analysis, recommendations }: InsightCardPr
 
     return (
         <div className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-6 text-white shadow-lg relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-                <Sparkles className="w-40 h-40" />
-            </div>
+
 
             <div className="relative z-10 space-y-6">
                 {/* Narrative Analysis */}

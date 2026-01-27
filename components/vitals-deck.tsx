@@ -1,4 +1,6 @@
-import { Activity, Droplets, Heart } from 'lucide-react'
+import { Activity, Droplets, Heart, Info } from 'lucide-react'
+import { Tooltip } from './ui/tooltip'
+import { getDefinition } from '@/lib/glossary'
 
 interface VitalsDeckProps {
     checkups: any[]
@@ -16,25 +18,39 @@ export default function VitalsDeck({ latestVitals }: { latestVitals: any[] }) {
 
     return (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {latestVitals.map((vital) => (
-                <div key={vital.label} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between h-32">
-                    <div className="flex items-start justify-between">
-                        <span className="text-gray-500 font-medium text-sm">{vital.label}</span>
-                        <Activity className="w-4 h-4 text-blue-400" />
-                    </div>
-                    <div>
-                        <div className="text-2xl font-bold text-gray-900">
-                            {vital.value} <span className="text-xs font-normal text-gray-400">{vital.unit}</span>
+            {latestVitals.map((vital) => {
+                const definition = getDefinition(vital.label)
+
+                return (
+                    <div key={vital.label} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col justify-between h-32">
+                        <div className="flex items-start justify-between">
+                            <div className="flex items-center gap-1.5">
+                                {definition ? (
+                                    <Tooltip content={definition}>
+                                        <span className="text-gray-500 font-medium text-sm border-b border-dotted border-gray-400 cursor-help">
+                                            {vital.label}
+                                        </span>
+                                    </Tooltip>
+                                ) : (
+                                    <span className="text-gray-500 font-medium text-sm">{vital.label}</span>
+                                )}
+                            </div>
+                            <Activity className="w-4 h-4 text-blue-400" />
                         </div>
-                        <div className="text-xs mt-1">
-                            {/* Logic for status color could go here */}
-                            <span className="text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
-                                Latest
-                            </span>
+                        <div>
+                            <div className="text-2xl font-bold text-gray-900">
+                                {vital.value} <span className="text-xs font-normal text-gray-400">{vital.unit}</span>
+                            </div>
+                            <div className="text-xs mt-1">
+                                {/* Logic for status color could go here */}
+                                <span className="text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                    Latest
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            ))}
+                )
+            })}
         </div>
     )
 }

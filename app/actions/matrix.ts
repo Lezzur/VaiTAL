@@ -3,11 +3,19 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
+export interface MatrixValue {
+    value: number | string
+    textValue?: string | null
+    min?: number | null
+    max?: number | null
+    unit?: string | null
+}
+
 export interface MatrixRow {
     marker: string
     unit: string
-    // mapping date YYYY-MM-DD to value (number or string)
-    values: Record<string, number | string>
+    // mapping date YYYY-MM-DD to rich value object
+    values: Record<string, MatrixValue>
 }
 
 export async function getMatrixData() {
@@ -29,6 +37,8 @@ export async function getMatrixData() {
       value,
       text_value,
       unit,
+      reference_range_min,
+      reference_range_max,
       checkups!inner (
         date
       )
@@ -59,9 +69,15 @@ export async function getMatrixData() {
             })
         }
         const row = rowMap.get(marker)!
-        // If text_value exists, prefer it, otherwise use value
-        // Prioritize text_value if value is null
-        const cellValue = r.text_value ? r.text_value : Number(r.value)
+
+        // Construct rich value object
+        const cellValue: MatrixValue = {
+            value: r.value !== null ? Number(r.value) : (r.text_value || '-'),
+            textValue: r.text_value,
+            min: r.reference_range_min !== null ? Number(r.reference_range_min) : undefined,
+            max: r.reference_range_max !== null ? Number(r.reference_range_max) : undefined,
+            unit: r.unit
+        }
 
         row.values[r.checkups.date] = cellValue
     })
