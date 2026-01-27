@@ -82,7 +82,7 @@ export default async function MatrixPage() {
                                             <tr key={row.marker} className="hover:bg-blue-50/30 transition-colors">
                                                 <th className="px-6 py-4 font-medium text-gray-900 sticky left-0 bg-white border-r border-gray-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] z-10">
                                                     {definition ? (
-                                                        <Tooltip content={definition}>
+                                                        <Tooltip content={definition} alignment="start">
                                                             <span className="cursor-help border-b border-dotted border-gray-400">
                                                                 {row.marker}
                                                             </span>

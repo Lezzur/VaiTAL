@@ -79,13 +79,13 @@ export default function CheckupReviewForm({ checkup, results: initialResults }: 
             </div>
 
             {/* Results Editor */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
                 <table className="w-full text-sm text-left">
                     <thead className="bg-gray-50 text-gray-700 uppercase">
                         <tr>
-                            <th className="px-6 py-3">Marker</th>
+                            <th className="px-6 py-3 rounded-tl-xl">Marker</th>
                             <th className="px-6 py-3">Value</th>
-                            <th className="px-6 py-3">Status</th>
+                            <th className="px-6 py-3 rounded-tr-xl">Status</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -104,7 +104,7 @@ export default function CheckupReviewForm({ checkup, results: initialResults }: 
                                                 className="bg-transparent border-b border-transparent focus:border-blue-300 focus:outline-none w-full"
                                             />
                                             {definition && (
-                                                <Tooltip content={definition}>
+                                                <Tooltip content={definition} alignment="start">
                                                     <Info className="w-4 h-4 text-blue-400 hover:text-blue-600 cursor-help transition-colors" />
                                                 </Tooltip>
                                             )}

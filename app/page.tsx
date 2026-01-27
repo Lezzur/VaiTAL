@@ -14,7 +14,7 @@ export default async function Home() {
                 <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <Activity className="w-6 h-6 text-blue-600" />
-                        <span className="font-bold text-gray-900 text-lg tracking-tight">Personal Lens</span>
+                        <span className="font-bold text-gray-900 text-lg tracking-tight">VaiTAL</span>
                     </div>
                     <Link
                         href="/upload"
