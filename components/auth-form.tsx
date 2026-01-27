@@ -52,7 +52,7 @@ export default function AuthForm() {
                     {isSignUp ? 'Create Account' : 'Welcome Back'}
                 </h1>
                 <p className="text-sm text-gray-500">
-                    Enter your credentials to access your Health Lens.
+                    Enter your credentials to access VaiTAL.
                 </p>
             </div>
 

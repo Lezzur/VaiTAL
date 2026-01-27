@@ -1,7 +1,8 @@
 import { ImageResponse } from 'next/og'
 
 // Route segment config
-export const runtime = 'edge'
+// Route segment config
+// export const runtime = 'edge'
 
 // Image metadata
 export function generateImageMetadata() {

@@ -1,11 +1,11 @@
-# Product Requirements Document (PRD): Personal Health Lens
+# Product Requirements Document (PRD): VaiTAL
 
 > **Vision**: A "magic lens" that transforms messy medical paper trails into clear, actionable health intelligence.
 
 ---
 
 ## 1. Project Overview
-*   **Name**: Personal Health Lens (working title: `personal-health-tracker`)
+*   **Name**: VaiTAL (formerly: `personal-health-tracker`)
 *   **Tagline**: Your personal AI health archivist.
 *   **Problem**: Patients receive critical health data (biomarkers) on localized, inconsistent paper or PDF reports. These get lost in drawers, making it impossible to see long-term trends (e.g., "Is my creatinine creeping up over 5 years?").
 *   **Solution**: A PWA that ingests photos of ANY lab result, uses AI to extract and normalize the data, and presents a unified dashboard of health trends.

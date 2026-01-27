@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
     return {
-        name: 'Personal Health Lens',
-        short_name: 'Health Lens',
+        name: 'VaiTAL',
+        short_name: 'VaiTAL',
         description: 'AI-powered health tracker',
         start_url: '/',
         display: 'standalone',
