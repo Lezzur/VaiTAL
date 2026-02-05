@@ -10,25 +10,29 @@ export default async function Home() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {/* Header */}
+            {/* Main Header */}
             <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
                 <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <Activity className="w-6 h-6 text-blue-600" />
                         <span className="font-bold text-gray-900 text-lg tracking-tight">VaiTAL</span>
                     </div>
-                    <div className="flex items-center gap-4">
-                        <UserMenu />
-                        <Link
-                            href="/upload"
-                            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
-                        >
-                            <Plus className="w-4 h-4" />
-                            New Results
-                        </Link>
-                    </div>
+                    <UserMenu />
                 </div>
             </header>
+
+            {/* Sub-Header Actions */}
+            <div className="bg-white border-b border-gray-100">
+                <div className="max-w-6xl mx-auto px-4 py-3 flex justify-end">
+                    <Link
+                        href="/upload"
+                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm text-sm"
+                    >
+                        <Plus className="w-4 h-4" />
+                        New Results
+                    </Link>
+                </div>
+            </div>
 
             {/* Main Content */}
             <main className="max-w-6xl mx-auto px-4 py-8">
