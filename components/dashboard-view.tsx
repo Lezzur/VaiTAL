@@ -6,7 +6,7 @@ import CheckupList from './checkup-list'
 import VitalsDeck from './vitals-deck'
 import InsightCard from './insight-card'
 import { getMarkerHistory } from '@/app/actions/data'
-import { Filter, Table, ArrowRight } from 'lucide-react'
+import { Filter, Table, ArrowRight, Plus } from 'lucide-react'
 import Link from 'next/link'
 
 interface DashboardViewProps {
@@ -69,16 +69,28 @@ export default function DashboardView({ checkups, allMarkers }: DashboardViewPro
                 <div className="md:col-span-2">
                     <InsightCard analysis={latestAnalysis} recommendations={latestRecommendations} />
                 </div>
-                <div className="bg-blue-600 rounded-xl p-6 text-white shadow-lg flex flex-col justify-center items-start space-y-2 hover:bg-blue-700 transition-colors cursor-pointer group">
-                    <Link href="/matrix" className="w-full h-full flex flex-col justify-center">
-                        <div className="flex items-center gap-2 mb-1 opacity-80">
-                            <Table className="w-5 h-5" />
-                            <span>Comprehensive View</span>
+                <div className="flex flex-col gap-4">
+                    <div className="bg-blue-600 rounded-xl p-6 text-white shadow-lg flex flex-col justify-center items-start space-y-2 hover:bg-blue-700 transition-colors cursor-pointer group flex-1">
+                        <Link href="/matrix" className="w-full h-full flex flex-col justify-center">
+                            <div className="flex items-center gap-2 mb-1 opacity-80">
+                                <Table className="w-5 h-5" />
+                                <span>Comprehensive View</span>
+                            </div>
+                            <div className="text-2xl font-bold flex items-center gap-2">
+                                Health Matrix <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            </div>
+                            <p className="text-sm opacity-70 mt-2">View all your results in a pivot table.</p>
+                        </Link>
+                    </div>
+
+                    <Link
+                        href="/upload"
+                        className="bg-white border-2 border-dashed border-gray-200 rounded-xl p-4 flex items-center justify-center gap-2 text-gray-500 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all group"
+                    >
+                        <div className="w-8 h-8 rounded-full bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
+                            <Plus className="w-5 h-5" />
                         </div>
-                        <div className="text-2xl font-bold flex items-center gap-2">
-                            Health Matrix <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                        </div>
-                        <p className="text-sm opacity-70 mt-2">View all your results in a pivot table.</p>
+                        <span className="font-semibold">Add New Results</span>
                     </Link>
                 </div>
             </div>
