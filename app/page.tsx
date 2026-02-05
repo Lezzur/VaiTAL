@@ -1,7 +1,8 @@
 import Link from 'next/link'
-import { Plus, Activity, LogOut } from 'lucide-react'
+import { Plus, Activity } from 'lucide-react'
 import { getRecentCheckups, getAllMarkers } from '@/app/actions/data'
 import DashboardView from '@/components/dashboard-view'
+import UserMenu from '@/components/user-menu'
 
 export default async function Home() {
     const checkups = await getRecentCheckups()
@@ -16,13 +17,16 @@ export default async function Home() {
                         <Activity className="w-6 h-6 text-blue-600" />
                         <span className="font-bold text-gray-900 text-lg tracking-tight">VaiTAL</span>
                     </div>
-                    <Link
-                        href="/upload"
-                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
-                    >
-                        <Plus className="w-4 h-4" />
-                        New Results
-                    </Link>
+                    <div className="flex items-center gap-4">
+                        <UserMenu />
+                        <Link
+                            href="/upload"
+                            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm"
+                        >
+                            <Plus className="w-4 h-4" />
+                            New Results
+                        </Link>
+                    </div>
                 </div>
             </header>
 
