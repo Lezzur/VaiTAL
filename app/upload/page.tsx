@@ -6,25 +6,11 @@ import LensScanner from '@/components/ui/LensScanner'
 import { analyzeImageAction } from '@/app/actions'
 import { createClient } from '@/lib/supabase'
 import { Loader2, CheckCircle, AlertCircle, Save } from 'lucide-react'
-
-// Define rudimentary types for the results to avoid 'any' if possible, or use any for now
-interface MarketResult {
-    marker_name: string
-    value: string
-    unit: string
-    reference_range_min: string
-    reference_range_max: string
-    confidence: number
-}
-
-interface ScanResults {
-    checkup_summary: string
-    market_results: MarketResult[]
-}
+import type { ExtractedCheckup } from '@/lib/gemini'
 
 export default function UploadPage() {
     const router = useRouter()
-    const [results, setResults] = useState<ScanResults | null>(null)
+    const [results, setResults] = useState<ExtractedCheckup | null>(null)
     const [isSaving, setIsSaving] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
@@ -34,10 +20,10 @@ export default function UploadPage() {
             // Call Server Action
             const response = await analyzeImageAction(base64Data, mimeType)
 
-            if (response.success) {
+            if (response.success && response.data) {
                 setResults(response.data)
             } else {
-                throw new Error(response.error)
+                throw new Error(response.error || 'Unknown error')
             }
 
         } catch (e: any) {
@@ -61,7 +47,7 @@ export default function UploadPage() {
                 .insert({
                     user_id: user.id,
                     date: new Date().toISOString().split('T')[0], // Today's date default
-                    summary: results.checkup_summary
+                    summary: results.summary
                 })
                 .select()
                 .single()
@@ -69,7 +55,7 @@ export default function UploadPage() {
             if (checkupError) throw checkupError
 
             // 2. Insert Results
-            const resultsToInsert = results.market_results.map(item => ({
+            const resultsToInsert = results.results.map((item) => ({
                 checkup_id: checkupData.id,
                 user_id: user.id,
                 marker_name: item.marker_name,
@@ -125,7 +111,7 @@ export default function UploadPage() {
                             <CheckCircle className="w-6 h-6 text-green-500" />
                             Analysis Complete
                         </h2>
-                        <p className="text-gray-500 mt-1">{results.checkup_summary}</p>
+                        <p className="text-gray-500 mt-1">{results.summary}</p>
                     </div>
 
                     <div className="p-0 overflow-x-auto">
@@ -139,7 +125,7 @@ export default function UploadPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {results.market_results.map((row, idx) => (
+                                {results.results.map((row, idx) => (
                                     <tr key={idx} className="bg-white border-b dark:bg-gray-900 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
                                         <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             {row.marker_name}
