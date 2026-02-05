@@ -21,18 +21,7 @@ export default async function Home() {
                 </div>
             </header>
 
-            {/* Sub-Header Actions */}
-            <div className="bg-white border-b border-gray-100">
-                <div className="max-w-6xl mx-auto px-4 py-3 flex justify-end">
-                    <Link
-                        href="/upload"
-                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-sm text-sm"
-                    >
-                        <Plus className="w-4 h-4" />
-                        New Results
-                    </Link>
-                </div>
-            </div>
+
 
             {/* Main Content */}
             <main className="max-w-6xl mx-auto px-4 py-8">

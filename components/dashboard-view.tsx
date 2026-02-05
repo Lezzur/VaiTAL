@@ -85,9 +85,9 @@ export default function DashboardView({ checkups, allMarkers }: DashboardViewPro
 
                     <Link
                         href="/upload"
-                        className="bg-white border-2 border-dashed border-gray-200 rounded-xl p-4 flex items-center justify-center gap-2 text-gray-500 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all group"
+                        className="bg-blue-600 rounded-xl p-4 flex items-center justify-center gap-2 text-white hover:bg-blue-700 transition-all shadow-lg group"
                     >
-                        <div className="w-8 h-8 rounded-full bg-gray-100 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
+                        <div className="w-8 h-8 rounded-full bg-white/20 group-hover:bg-white/30 flex items-center justify-center transition-colors">
                             <Plus className="w-5 h-5" />
                         </div>
                         <span className="font-semibold">Add New Results</span>
