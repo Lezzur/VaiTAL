@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Plus, Loader2 } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase'
 
 export default function Home() {
     const [loading, setLoading] = useState(true)
@@ -21,7 +21,7 @@ export default function Home() {
     useEffect(() => {
         async function loadData() {
             try {
-                const { data: { user } } = await supabase.auth.getUser()
+                const { data: { user } } = await createClient().auth.getUser()
                 setUser(user)
 
                 if (!user) {
@@ -30,19 +30,19 @@ export default function Home() {
                 }
 
                 // Fetch Checkups Count
-                const { count: checkupCount, error: checkupError } = await supabase
+                const { count: checkupCount, error: checkupError } = await createClient()
                     .from('checkups')
                     .select('*', { count: 'exact', head: true })
                 if (checkupError) throw checkupError
 
                 // Fetch Total Markers Count
-                const { count: markerCount, error: markerError } = await supabase
+                const { count: markerCount, error: markerError } = await createClient()
                     .from('results')
                     .select('*', { count: 'exact', head: true })
                 if (markerError) throw markerError
 
                 // Fetch Latest Date
-                const { data: latestCheckup, error: latestError } = await supabase // eslint-disable-line @typescript-eslint/no-unused-vars
+                const { data: latestCheckup, error: latestError } = await createClient() // eslint-disable-line @typescript-eslint/no-unused-vars
                     .from('checkups')
                     .select('date')
                     .order('date', { ascending: false })
@@ -76,10 +76,10 @@ export default function Home() {
         if (!email || !password) return
 
         // Try sign in
-        let { error } = await supabase.auth.signInWithPassword({ email, password })
+        let { error } = await createClient().auth.signInWithPassword({ email, password })
         if (error) {
             // Try sign up if login fails
-            const { error: signUpError } = await supabase.auth.signUp({ email, password })
+            const { error: signUpError } = await createClient().auth.signUp({ email, password })
             if (signUpError) {
                 alert("Error: " + signUpError.message)
                 return

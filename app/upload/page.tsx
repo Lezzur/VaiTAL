@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import LensScanner from '@/components/ui/LensScanner'
 import { analyzeImageAction } from '@/app/actions'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@/lib/supabase'
 import { Loader2, CheckCircle, AlertCircle, Save } from 'lucide-react'
 
 // Define rudimentary types for the results to avoid 'any' if possible, or use any for now
@@ -52,11 +52,11 @@ export default function UploadPage() {
         setError(null)
 
         try {
-            const { data: { user } } = await supabase.auth.getUser()
+            const { data: { user } } = await createClient().auth.getUser()
             if (!user) throw new Error("User not authenticated")
 
             // 1. Insert Checkup
-            const { data: checkupData, error: checkupError } = await supabase
+            const { data: checkupData, error: checkupError } = await createClient()
                 .from('checkups')
                 .insert({
                     user_id: user.id,
@@ -80,7 +80,7 @@ export default function UploadPage() {
                 confidence: item.confidence
             }))
 
-            const { error: resultsError } = await supabase
+            const { error: resultsError } = await createClient()
                 .from('results')
                 .insert(resultsToInsert)
 

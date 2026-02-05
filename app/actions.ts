@@ -1,6 +1,6 @@
 'use server'
 
-import { extractHealthData } from '@/lib/gemini'
+import { extractDataFromImage } from '@/lib/gemini'
 
 /**
  * Server Action to analyze a medical document image.
@@ -9,7 +9,7 @@ import { extractHealthData } from '@/lib/gemini'
 export async function analyzeImageAction(base64Data: string, mimeType: string) {
     try {
         console.log("Analyzing image with Gemini...")
-        const data = await extractHealthData(base64Data, mimeType)
+        const data = await extractDataFromImage(base64Data, mimeType)
         return { success: true, data }
     } catch (error: any) {
         console.error("Gemini analysis failed:", error)
