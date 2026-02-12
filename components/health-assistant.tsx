@@ -1,14 +1,16 @@
 
 'use client'
 
-import { useChat } from 'ai/react'
+import { useChat } from '@ai-sdk/react'
 import { useState, useRef, useEffect } from 'react'
 import { MessageCircle, X, Send, User, ChevronDown, Stethoscope } from 'lucide-react'
 import { clsx } from 'clsx'
 
 export default function HealthAssistant() {
     const [isOpen, setIsOpen] = useState(false)
-    const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat()
+    const { messages, sendMessage, status } = useChat()
+    const [input, setInput] = useState('')
+    const isLoading = status === 'submitted' || status === 'streaming'
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
     const scrollToBottom = () => {
@@ -18,6 +20,20 @@ export default function HealthAssistant() {
     useEffect(() => {
         scrollToBottom()
     }, [messages])
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInput(e.target.value)
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!input.trim()) return
+
+        // Create a new message object
+        const newMessage: any = { role: 'user', content: input }
+        await sendMessage(newMessage)
+        setInput('')
+    }
 
     return (
         <>
@@ -100,7 +116,7 @@ export default function HealthAssistant() {
                                         : "bg-white text-gray-800 border border-gray-100 rounded-tl-none"
                                 )}
                             >
-                                {m.content}
+                                {(m as any).content}
                             </div>
                         </div>
                     ))}

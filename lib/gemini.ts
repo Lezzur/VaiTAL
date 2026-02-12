@@ -30,6 +30,26 @@ export interface ExtractedCheckup {
   results: ExtractedResult[];
 }
 
+export interface ExtractedMedicine {
+  name: string;
+  dosage?: string;
+  frequency?: string;
+  duration?: string;
+  description?: string;
+  contraindications?: string;
+  warnings?: string;
+  instructions?: string;
+  confidence: number;
+}
+
+export interface ExtractedPrescription {
+  date: string;
+  doctor_name?: string;
+  notes?: string;
+  server_analysis?: string; // Overall analysis of the prescription
+  medicines: ExtractedMedicine[];
+}
+
 export async function extractDataFromImage(base64Image: string, mimeType: string): Promise<ExtractedCheckup> {
   const prompt = `
     You are an expert medical data analyst. Your task is to extract structured lab results from the provided image of a medical report.
@@ -166,5 +186,117 @@ export async function extractDataFromText(textInput: string): Promise<ExtractedC
   } catch (e) {
     console.error("Failed to parse Gemini response for text input:", text);
     throw new Error("AI extraction failed to produce valid JSON from text.");
+  }
+}
+
+export async function extractPrescriptionFromImage(base64Image: string, mimeType: string): Promise<ExtractedPrescription> {
+  const prompt = `
+    You are an expert pharmacist and medical data analyst. Your task is to extract structured prescription details from the provided image.
+
+    Extract the following information:
+    1. The date of the prescription (YYYY-MM-DD). If ambiguous, estimate from context or return today's date.
+    2. Doctor's Name (if available).
+    3. General Notes or context found on the prescription.
+    4. A list of ALL medicines prescribed.
+    
+    For EACH medicine, extract:
+    - Name (Standardized generic or brand name)
+    - Dosage (e.g., "500mg")
+    - Frequency (e.g., "Twice a day", "Every 8 hours")
+    - Duration (e.g., "7 days", "1 month")
+    - Description/Purpose (What is this medicine typically used for? e.g. "Antibiotic", "Pain reliever")
+    - Contraindications (Common contraindications, e.g. "Do not take with alcohol", "Avoid if pregnant")
+    - Warnings (Common side effects or warnings, e.g. "May cause drowsiness")
+    - Instructions (Specific instructions found, e.g. "Take after food")
+    - Confidence (0.0 to 1.0)
+
+    Return strictly valid JSON with this structure:
+    {
+      "date": "YYYY-MM-DD",
+      "doctor_name": "...",
+      "notes": "...",
+      "server_analysis": "This prescription contains antibiotics, please finish the full course...",
+      "medicines": [
+        {
+          "name": "...",
+          "dosage": "...",
+          "frequency": "...",
+          "duration": "...",
+          "description": "...",
+          "contraindications": "...",
+          "warnings": "...",
+          "instructions": "...",
+          "confidence": 0.95
+        }
+      ]
+    }
+    
+    Do not include markdown code blocks. Return ONLY the raw JSON string.
+  `;
+
+  const imagePart = {
+    inlineData: {
+      data: base64Image,
+      mimeType,
+    },
+  };
+
+  const result = await visionModel.generateContent([prompt, imagePart]);
+  const response = await result.response;
+  const text = response.text();
+  const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+  try {
+    return JSON.parse(jsonString) as ExtractedPrescription;
+  } catch (e) {
+    console.error("Failed to parse Gemini prescription response:", text);
+    throw new Error("AI extraction failed to produce valid JSON for prescription.");
+  }
+}
+
+export async function extractPrescriptionFromText(textInput: string): Promise<ExtractedPrescription> {
+  const prompt = `
+    You are an expert pharmacist. Extract structured prescription details from the provided text.
+
+    Extract:
+    1. Date (YYYY-MM-DD)
+    2. Doctor's Name
+    3. Notes
+    4. List of Medicines (Name, Dosage, Frequency, Duration, Description, Contraindications, Warnings, Instructions)
+
+    Return strictly valid JSON with this structure:
+    {
+      "date": "YYYY-MM-DD",
+      "doctor_name": "...",
+      "notes": "...",
+      "server_analysis": "...",
+      "medicines": [
+        {
+          "name": "...",
+          "dosage": "...",
+          "frequency": "...",
+          "duration": "...",
+          "description": "...",
+          "contraindications": "...",
+          "warnings": "...",
+          "instructions": "...",
+          "confidence": 0.95
+        }
+      ]
+    }
+
+    Do not include markdown code blocks. Return ONLY the raw JSON string.
+  `;
+
+  const result = await textModel.generateContent([prompt, textInput]);
+  const response = await result.response;
+  const text = response.text();
+  const jsonString = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+  try {
+    return JSON.parse(jsonString) as ExtractedPrescription;
+  } catch (e) {
+    console.error("Failed to parse Gemini prescription text response:", text);
+    throw new Error("AI extraction failed to produce valid JSON for prescription text.");
   }
 }
