@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useRef } from 'react'
-import { UploadCloud, Loader2, FileText, CheckCircle, AlertCircle } from 'lucide-react'
+import { useState, useRef, useEffect } from 'react'
+import { UploadCloud, Loader2, FileText, CheckCircle, AlertCircle, X, Image as ImageIcon } from 'lucide-react'
 import { processDocument } from '@/app/actions/analyze'
 import { clsx } from 'clsx'
 import { useRouter } from 'next/navigation'
@@ -9,17 +9,46 @@ import { useRouter } from 'next/navigation'
 export default function UploadZone() {
     const [isDragging, setIsDragging] = useState(false)
     const [file, setFile] = useState<File | null>(null)
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+    const [textInput, setTextInput] = useState('')
     const [status, setStatus] = useState<'idle' | 'analyzing' | 'success' | 'error'>('idle')
     const [errorMessage, setErrorMessage] = useState('')
+
     const fileInputRef = useRef<HTMLInputElement>(null)
     const router = useRouter()
+
+    // Clean up preview URL on unmount or file change
+    useEffect(() => {
+        return () => {
+            if (previewUrl) URL.revokeObjectURL(previewUrl)
+        }
+    }, [previewUrl])
+
+    const handleFile = (selectedFile: File) => {
+        setFile(selectedFile)
+
+        // Create preview if it's an image
+        if (selectedFile.type.startsWith('image/')) {
+            const url = URL.createObjectURL(selectedFile)
+            setPreviewUrl(url)
+        } else {
+            setPreviewUrl(null)
+        }
+    }
+
+    const removeFile = () => {
+        setFile(null)
+        if (previewUrl) URL.revokeObjectURL(previewUrl)
+        setPreviewUrl(null)
+    }
 
     const handleDragOver = (e: React.DragEvent) => {
         e.preventDefault()
         setIsDragging(true)
     }
 
-    const handleDragLeave = () => {
+    const handleDragLeave = (e: React.DragEvent) => {
+        e.preventDefault()
         setIsDragging(false)
     }
 
@@ -27,24 +56,38 @@ export default function UploadZone() {
         e.preventDefault()
         setIsDragging(false)
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            setFile(e.dataTransfer.files[0])
+            handleFile(e.dataTransfer.files[0])
         }
+    }
+
+    const handlePaste = (e: React.ClipboardEvent) => {
+        // Check for files (images) in clipboard
+        if (e.clipboardData.files && e.clipboardData.files.length > 0) {
+            e.preventDefault()
+            const pastedFile = e.clipboardData.files[0]
+            handleFile(pastedFile)
+        }
+        // If text, let the textarea handle it natively via state binding
     }
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            setFile(e.target.files[0])
+            handleFile(e.target.files[0])
         }
     }
 
     const handleUpload = async () => {
-        if (!file) return
+        if (!file && !textInput.trim()) return
 
         setStatus('analyzing')
         setErrorMessage('')
 
         const formData = new FormData()
-        formData.append('file', file)
+        if (file) {
+            formData.append('file', file)
+        } else {
+            formData.append('text', textInput)
+        }
 
         const result = await processDocument(formData)
         console.log("Upload Result:", result)
@@ -61,86 +104,113 @@ export default function UploadZone() {
         }
     }
 
+    const isReady = file !== null || textInput.trim().length > 0
+
     return (
-        <div className="w-full max-w-xl mx-auto space-y-6">
+        <div className="w-full max-w-2xl mx-auto space-y-6">
+
+            {/* Main Input Area */}
             <div
                 className={clsx(
-                    "relative border-2 border-dashed rounded-xl p-12 transition-all text-center",
-                    isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400 bg-gray-50",
+                    "relative border-2 border-dashed rounded-xl p-6 transition-all bg-white shadow-sm",
+                    isDragging ? "border-blue-500 bg-blue-50 ring-4 ring-blue-100" : "border-gray-300 hover:border-gray-400",
                     status === 'analyzing' && "opacity-50 pointer-events-none"
                 )}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
             >
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    className="hidden"
-                    accept="image/*,application/pdf"
-                    onChange={handleFileSelect}
-                />
-
-                {!file ? (
-                    <div className="space-y-4" onClick={() => fileInputRef.current?.click()}>
-                        <div className="mx-auto w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center">
-                            <UploadCloud className="w-6 h-6 text-blue-600" />
-                        </div>
-                        <div>
-                            <p className="text-lg font-medium text-gray-900">
-                                Click or drag & drop to upload
-                            </p>
-                            <p className="text-sm text-gray-500 mt-1">
-                                Supports Images (JPG, PNG) and PDF
-                            </p>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="space-y-4">
-                        <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                            <FileText className="w-6 h-6 text-blue-600" />
-                        </div>
-                        <div>
-                            <p className="font-medium text-gray-900">{file.name}</p>
-                            <p className="text-sm text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                {/* File Preview Card */}
+                {file && (
+                    <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200 flex items-center gap-3 group relative">
+                        {previewUrl ? (
+                            <img src={previewUrl} alt="Preview" className="w-12 h-12 object-cover rounded-md" />
+                        ) : (
+                            <div className="w-12 h-12 bg-white rounded-md flex items-center justify-center border">
+                                <FileText className="w-6 h-6 text-blue-600" />
+                            </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                            <p className="font-medium text-gray-900 truncate">{file.name}</p>
+                            <p className="text-xs text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                         </div>
                         <button
-                            onClick={(e) => { e.stopPropagation(); setFile(null); }}
-                            className="text-sm text-red-500 hover:underline"
+                            onClick={removeFile}
+                            className="p-1 hover:bg-gray-200 rounded-full text-gray-500 hover:text-red-500 transition-colors"
                         >
-                            Remove
+                            <X className="w-5 h-5" />
                         </button>
                     </div>
                 )}
+
+                {/* Text Area */}
+                <textarea
+                    value={textInput}
+                    onChange={(e) => setTextInput(e.target.value)}
+                    onPaste={handlePaste}
+                    placeholder={file ? "Add optional notes... (File will be prioritized)" : "Paste lab results here, type manually, or drag & drop a file..."}
+                    className="w-full min-h-[150px] resize-none border-none focus:ring-0 text-gray-700 placeholder:text-gray-400 text-lg bg-transparent"
+                    disabled={status === 'analyzing'}
+                />
+
+                {/* Bottom Actions */}
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
+                    <div className="flex gap-2">
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            className="hidden"
+                            accept="image/*,application/pdf"
+                            onChange={handleFileSelect}
+                        />
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-2 text-sm font-medium"
+                            title="Upload File"
+                        >
+                            <UploadCloud className="w-5 h-5" />
+                            <span className="hidden sm:inline">Upload File</span>
+                        </button>
+                        <div className="h-6 w-px bg-gray-200 my-auto mx-2" />
+                        <span className="text-xs text-gray-400 flex items-center">
+                            Supports JPG, PNG, PDF & Text
+                        </span>
+                    </div>
+
+                    <button
+                        onClick={handleUpload}
+                        disabled={!isReady || status === 'analyzing'}
+                        className={clsx(
+                            "px-6 py-2 rounded-lg font-medium flex items-center gap-2 transition-all shadow-sm",
+                            isReady && status !== 'analyzing'
+                                ? "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-md"
+                                : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        )}
+                    >
+                        {status === 'analyzing' ? (
+                            <>
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                                Processing...
+                            </>
+                        ) : (
+                            <>
+                                Analyze Results
+                            </>
+                        )}
+                    </button>
+                </div>
             </div>
 
-            {/* Buttons & Status */}
-            {file && status !== 'success' && (
-                <button
-                    onClick={handleUpload}
-                    disabled={status === 'analyzing'}
-                    className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                    {status === 'analyzing' ? (
-                        <>
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            Analyzing with Personal Lens...
-                        </>
-                    ) : (
-                        'Process Document'
-                    )}
-                </button>
-            )}
-
+            {/* Status Messages */}
             {status === 'success' && (
-                <div className="p-4 bg-green-50 text-green-700 rounded-lg flex items-center gap-2">
+                <div className="p-4 bg-green-50 text-green-700 rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
                     <CheckCircle className="w-5 h-5" />
-                    Analysis Complete! Checkup saved to database.
+                    Analysis Complete! Redirecting...
                 </div>
             )}
 
             {status === 'error' && (
-                <div className="p-4 bg-red-50 text-red-700 rounded-lg flex items-center gap-2">
+                <div className="p-4 bg-red-50 text-red-700 rounded-xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
                     <AlertCircle className="w-5 h-5" />
                     {errorMessage}
                 </div>

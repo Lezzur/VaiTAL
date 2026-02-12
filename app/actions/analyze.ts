@@ -2,7 +2,7 @@
 
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { extractDataFromImage } from '@/lib/gemini'
+import { extractDataFromImage, extractDataFromText } from '@/lib/gemini'
 import { revalidatePath } from 'next/cache'
 
 export async function processDocument(formData: FormData) {
@@ -24,15 +24,25 @@ export async function processDocument(formData: FormData) {
     if (authError || !user) throw new Error('Unauthorized')
 
     // 2. Prepare for AI
-    const arrayBuffer = await file.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
-    const base64Image = buffer.toString('base64')
-    const mimeType = file.type
+    let extractedData;
+    const textInput = formData.get('text') as string;
 
     try {
-        // 3. AI Extraction
-        console.log('Sending to Gemini...')
-        const extractedData = await extractDataFromImage(base64Image, mimeType)
+        if (file && file.size > 0) {
+            const arrayBuffer = await file.arrayBuffer()
+            const buffer = Buffer.from(arrayBuffer)
+            const base64Image = buffer.toString('base64')
+            const mimeType = file.type
+
+            console.log('Sending image to Gemini...')
+            extractedData = await extractDataFromImage(base64Image, mimeType)
+        } else if (textInput && textInput.trim().length > 0) {
+            console.log('Sending text to Gemini...')
+            extractedData = await extractDataFromText(textInput)
+        } else {
+            throw new Error('No file or text provided')
+        }
+
         console.log('Extracted:', extractedData)
 
         // 4. Database Insertions
