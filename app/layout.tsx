@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import HealthAssistant from '@/components/health-assistant'
 import { Outfit } from 'next/font/google'
 import './globals.css'
 
@@ -24,7 +25,10 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en">
-            <body className={`${outfit.className} min-h-screen bg-gray-50 pb-[env(safe-area-inset-bottom)] antialiased`}>{children}</body>
+            <body className={`${outfit.className} min-h-screen bg-gray-50 pb-[env(safe-area-inset-bottom)] antialiased`}>
+                {children}
+                <HealthAssistant />
+            </body>
         </html>
     )
 }
