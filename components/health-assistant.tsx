@@ -10,9 +10,12 @@ import { createClient } from '@/lib/supabase'
 export default function HealthAssistant() {
     const [isOpen, setIsOpen] = useState(false)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
-    const { messages, sendMessage, status } = useChat()
+    const { messages, sendMessage, status, error } = useChat()
     const [input, setInput] = useState('')
     const isLoading = status === 'submitted' || status === 'streaming'
+
+    // Debug logging
+    console.log('[chat] status:', status, 'error:', error, 'messages:', messages.length)
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const supabase = createClient()
 
@@ -100,12 +103,19 @@ export default function HealthAssistant() {
 
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50" tabIndex={0} aria-label="Chat messages">
-                    {messages.length === 0 && (
+                    {messages.length === 0 && !error && (
                         <div className="text-center text-gray-500 mt-8 text-sm space-y-2">
                             <Stethoscope className="w-12 h-12 mx-auto text-gray-300" />
                             <p>Hello! I'm your AI Medical Assistant.</p>
                             <p>I have access to your uploaded results.</p>
                             <p>Ask me anything about your health.</p>
+                        </div>
+                    )}
+
+                    {error && (
+                        <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-lg text-sm">
+                            <p className="font-semibold">Error:</p>
+                            <p>{error.message || String(error)}</p>
                         </div>
                     )}
 
