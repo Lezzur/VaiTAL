@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from 'react'
 import { MessageCircle, X, Send, User, ChevronDown, Stethoscope } from 'lucide-react'
 import { clsx } from 'clsx'
 import { createClient } from '@/lib/supabase'
+import Markdown from 'react-markdown'
 
 export default function HealthAssistant() {
     const [isOpen, setIsOpen] = useState(false)
@@ -142,10 +143,13 @@ export default function HealthAssistant() {
                                     "p-3 rounded-2xl text-sm shadow-sm",
                                     m.role === 'user'
                                         ? "bg-blue-600 text-white rounded-tr-none"
-                                        : "bg-white text-gray-800 border border-gray-100 rounded-tl-none"
+                                        : "bg-white text-gray-800 border border-gray-100 rounded-tl-none prose prose-sm max-w-none"
                                 )}
                             >
-                                {m.parts.filter(p => p.type === 'text').map(p => p.text).join('')}
+                                {m.role === 'user'
+                                    ? m.parts.filter(p => p.type === 'text').map(p => p.text).join('')
+                                    : <Markdown>{m.parts.filter(p => p.type === 'text').map(p => p.text).join('')}</Markdown>
+                                }
                             </div>
                         </div>
                     ))}
