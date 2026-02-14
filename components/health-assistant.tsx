@@ -2,8 +2,7 @@
 'use client'
 
 import { useChat } from '@ai-sdk/react'
-import { DefaultChatTransport } from 'ai'
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { MessageCircle, X, Send, User, ChevronDown, Stethoscope } from 'lucide-react'
 import { clsx } from 'clsx'
 import { createClient } from '@/lib/supabase'
@@ -11,13 +10,7 @@ import { createClient } from '@/lib/supabase'
 export default function HealthAssistant() {
     const [isOpen, setIsOpen] = useState(false)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
-
-    const transport = useMemo(() => new DefaultChatTransport({
-        api: '/api/chat',
-        credentials: 'include',
-    }), [])
-
-    const { messages, sendMessage, status, error } = useChat({ transport })
+    const { messages, sendMessage, status, error } = useChat()
     const [input, setInput] = useState('')
     const isLoading = status === 'submitted' || status === 'streaming'
 
