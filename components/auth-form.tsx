@@ -4,11 +4,12 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
-import { Mail, Lock, Loader2 } from 'lucide-react'
+import { Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react'
 
 export default function AuthForm() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
     const [isSignUp, setIsSignUp] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -84,13 +85,21 @@ export default function AuthForm() {
                     <div className="relative">
                         <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                         <input
-                            type="password"
+                            type={showPassword ? 'text' : 'password'}
                             placeholder="••••••••"
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            aria-label={showPassword ? 'Hide password' : 'Show password'}
+                            className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
                     </div>
                 </div>
 

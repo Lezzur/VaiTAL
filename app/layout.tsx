@@ -9,10 +9,27 @@ const outfit = Outfit({ subsets: ['latin'] })
 export const metadata: Metadata = {
     title: 'VaiTAL - AI Health Tracker',
     description: 'AI-powered health tracker for managing your lab results and medications',
+    metadataBase: new URL('https://vaital.vercel.app'),
     openGraph: {
         title: 'VaiTAL - AI Health Tracker',
         description: 'AI-powered health tracker for managing your lab results and medications',
+        url: 'https://vaital.vercel.app',
+        siteName: 'VaiTAL',
         type: 'website',
+        images: [
+            {
+                url: '/og-image.png',
+                width: 1200,
+                height: 630,
+                alt: 'VaiTAL - AI Health Tracker',
+            },
+        ],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'VaiTAL - AI Health Tracker',
+        description: 'AI-powered health tracker for managing your lab results and medications',
+        images: ['/og-image.png'],
     },
 }
 
