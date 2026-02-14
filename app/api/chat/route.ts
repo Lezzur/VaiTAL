@@ -7,23 +7,34 @@ import { createClient } from '@/lib/supabase/server';
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
-    const { messages } = await req.json();
+    try {
+        const { messages } = await req.json();
 
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+        const supabase = await createClient();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (!user) {
-        return new Response('Unauthorized', { status: 401 });
-    }
+        if (authError) {
+            console.error('[chat] Auth error:', authError);
+            return new Response(JSON.stringify({ error: 'Auth failed', details: authError.message }), { status: 401 });
+        }
 
-    const history = await getPatientHistory(user.id);
-    const context = JSON.stringify(history, null, 2);
+        if (!user) {
+            console.error('[chat] No user found');
+            return new Response('Unauthorized', { status: 401 });
+        }
 
-    const result = streamText({
-        model: google('gemini-1.5-pro-latest'),
-        system: `
+        console.log('[chat] User authenticated:', user.id);
+
+        const history = await getPatientHistory(user.id);
+        console.log('[chat] Patient history retrieved:', history ? 'yes' : 'no');
+        const context = JSON.stringify(history, null, 2);
+
+        console.log('[chat] Calling Gemini API...');
+        const result = streamText({
+            model: google('gemini-1.5-pro-latest'),
+            system: `
       You are an expert Medical Professional AI.
-      
+
       Your goal is to act as a personal doctor for the user.
       You have access to the user's recent medical history and checkup results:
       ${context}
@@ -41,8 +52,13 @@ export async function POST(req: Request) {
       6. Be empathetic, professional, and encouraging.
       7. Disclaimer: Always remind them you are an AI and they should see a real doctor for emergencies.
     `,
-        messages,
-    });
+            messages,
+        });
 
-    return result.toTextStreamResponse();
+        console.log('[chat] Stream started');
+        return result.toTextStreamResponse();
+    } catch (error) {
+        console.error('[chat] Error:', error);
+        return new Response(JSON.stringify({ error: 'Chat failed', details: String(error) }), { status: 500 });
+    }
 }
