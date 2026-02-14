@@ -10,7 +10,9 @@ import { createClient } from '@/lib/supabase'
 export default function HealthAssistant() {
     const [isOpen, setIsOpen] = useState(false)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
-    const { messages, sendMessage, status, error } = useChat()
+    const { messages, sendMessage, status, error } = useChat({
+        fetch: (url, options) => fetch(url, { ...options, credentials: 'include' }),
+    })
     const [input, setInput] = useState('')
     const isLoading = status === 'submitted' || status === 'streaming'
 
