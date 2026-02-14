@@ -31,7 +31,7 @@ export async function POST(req: Request) {
 
         console.log('[chat] Calling Gemini API...');
         const result = streamText({
-            model: google('gemini-2.0-flash'),
+            model: google('gemini-2.5-flash'),
             system: `
       You are an expert Medical Professional AI.
 
