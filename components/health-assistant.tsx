@@ -16,6 +16,7 @@ export default function HealthAssistant() {
 
     // Debug logging
     console.log('[chat] status:', status, 'error:', error, 'messages:', messages.length)
+    console.log('[chat] full messages:', JSON.stringify(messages, null, 2))
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const supabase = createClient()
 
