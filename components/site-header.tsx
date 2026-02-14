@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation'
 
 export default function SiteHeader() {
     const pathname = usePathname()
-    const isLoginPage = pathname === '/login'
+    const isPublicPage = pathname === '/login' || pathname === '/forgot-password' || pathname?.startsWith('/auth')
 
     return (
         <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -18,7 +18,7 @@ export default function SiteHeader() {
                         <span className="font-bold text-gray-900 text-lg tracking-tight">VaiTAL</span>
                     </Link>
 
-                    {!isLoginPage && (
+                    {!isPublicPage && (
                         <nav className="hidden md:flex items-center gap-6">
                             <Link
                                 href="/"
@@ -39,7 +39,7 @@ export default function SiteHeader() {
 
                 <div className="flex items-center gap-4">
                     {/* Mobile Nav could go here */}
-                    {!isLoginPage && <UserMenu />}
+                    {!isPublicPage && <UserMenu />}
                 </div>
             </div>
         </header>
