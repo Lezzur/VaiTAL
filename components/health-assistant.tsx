@@ -5,13 +5,30 @@ import { useChat } from '@ai-sdk/react'
 import { useState, useRef, useEffect } from 'react'
 import { MessageCircle, X, Send, User, ChevronDown, Stethoscope } from 'lucide-react'
 import { clsx } from 'clsx'
+import { createClient } from '@/lib/supabase'
 
 export default function HealthAssistant() {
     const [isOpen, setIsOpen] = useState(false)
+    const [isAuthenticated, setIsAuthenticated] = useState(false)
     const { messages, sendMessage, status } = useChat()
     const [input, setInput] = useState('')
     const isLoading = status === 'submitted' || status === 'streaming'
     const messagesEndRef = useRef<HTMLDivElement>(null)
+    const supabase = createClient()
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const { data: { session } } = await supabase.auth.getSession()
+            setIsAuthenticated(!!session)
+        }
+        checkAuth()
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setIsAuthenticated(!!session)
+        })
+
+        return () => subscription.unsubscribe()
+    }, [supabase.auth])
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -35,11 +52,14 @@ export default function HealthAssistant() {
         setInput('')
     }
 
+    if (!isAuthenticated) return null
+
     return (
         <>
             {/* Floating Button */}
             <button
                 onClick={() => setIsOpen(!isOpen)}
+                aria-label={isOpen ? 'Close Medical Assistant' : 'Open Medical Assistant'}
                 className={clsx(
                     "fixed bottom-6 right-6 p-4 rounded-full shadow-lg transition-all z-50 flex items-center gap-2",
                     isOpen ? "bg-red-500 hover:bg-red-600 rotate-90" : "bg-blue-600 hover:bg-blue-700 hover:scale-110"
@@ -75,13 +95,13 @@ export default function HealthAssistant() {
                             </p>
                         </div>
                     </div>
-                    <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 p-1 rounded">
+                    <button onClick={() => setIsOpen(false)} aria-label="Minimize chat" className="hover:bg-white/20 p-1 rounded">
                         <ChevronDown className="w-5 h-5" />
                     </button>
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50" tabIndex={0} aria-label="Chat messages">
                     {messages.length === 0 && (
                         <div className="text-center text-gray-500 mt-8 text-sm space-y-2">
                             <Stethoscope className="w-12 h-12 mx-auto text-gray-300" />
@@ -150,6 +170,7 @@ export default function HealthAssistant() {
                         <button
                             type="submit"
                             disabled={isLoading || !input.trim()}
+                            aria-label="Send message"
                             className="absolute right-2 top-2 p-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:hover:bg-blue-600 transition-colors"
                         >
                             <Send className="w-4 h-4" />

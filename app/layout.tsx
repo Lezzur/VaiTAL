@@ -7,15 +7,19 @@ import SiteHeader from '@/components/site-header'
 const outfit = Outfit({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-    title: 'VaiTAL',
-    description: 'AI-powered health tracker',
+    title: 'VaiTAL - AI Health Tracker',
+    description: 'AI-powered health tracker for managing your lab results and medications',
+    openGraph: {
+        title: 'VaiTAL - AI Health Tracker',
+        description: 'AI-powered health tracker for managing your lab results and medications',
+        type: 'website',
+    },
 }
 
 export const viewport: Viewport = {
     themeColor: '#ffffff',
     width: 'device-width',
     initialScale: 1,
-    maximumScale: 1,
     viewportFit: 'cover',
 }
 

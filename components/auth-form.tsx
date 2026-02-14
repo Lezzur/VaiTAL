@@ -64,7 +64,7 @@ export default function AuthForm() {
                         <input
                             type="email"
                             placeholder="name@example.com"
-                            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -73,13 +73,20 @@ export default function AuthForm() {
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">Password</label>
+                    <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium text-gray-700">Password</label>
+                        {!isSignUp && (
+                            <a href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+                                Forgot password?
+                            </a>
+                        )}
+                    </div>
                     <div className="relative">
                         <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                         <input
                             type="password"
                             placeholder="••••••••"
-                            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
@@ -96,6 +103,7 @@ export default function AuthForm() {
                 <button
                     type="submit"
                     disabled={loading}
+                    aria-label={isSignUp ? 'Sign Up' : 'Sign In'}
                     className="w-full flex items-center justify-center py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
                     {loading ? (
@@ -107,13 +115,14 @@ export default function AuthForm() {
             </form>
 
             <div className="text-center">
+                <span className="text-sm text-gray-600">
+                    {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
+                </span>
                 <button
                     onClick={() => setIsSignUp(!isSignUp)}
-                    className="text-sm text-gray-600 hover:text-blue-600 hover:underline transition-colors"
+                    className="text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors"
                 >
-                    {isSignUp
-                        ? 'Already have an account? Sign in'
-                        : "Don't have an account? Sign up"}
+                    {isSignUp ? 'Sign In' : 'Sign Up'}
                 </button>
             </div>
         </div>
