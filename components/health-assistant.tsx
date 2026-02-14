@@ -46,9 +46,7 @@ export default function HealthAssistant() {
         e.preventDefault()
         if (!input.trim()) return
 
-        // Create a new message object
-        const newMessage: any = { role: 'user', content: input }
-        await sendMessage(newMessage)
+        await sendMessage({ text: input })
         setInput('')
     }
 
@@ -136,7 +134,7 @@ export default function HealthAssistant() {
                                         : "bg-white text-gray-800 border border-gray-100 rounded-tl-none"
                                 )}
                             >
-                                {(m as any).content}
+                                {m.parts.filter(p => p.type === 'text').map(p => p.text).join('')}
                             </div>
                         </div>
                     ))}
