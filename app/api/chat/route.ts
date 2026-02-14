@@ -56,7 +56,7 @@ export async function POST(req: Request) {
         });
 
         console.log('[chat] Stream started');
-        return result.toTextStreamResponse();
+        return result.toDataStreamResponse();
     } catch (error) {
         console.error('[chat] Error:', error);
         return new Response(JSON.stringify({ error: 'Chat failed', details: String(error) }), { status: 500 });
