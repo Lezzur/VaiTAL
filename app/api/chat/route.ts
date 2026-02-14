@@ -6,9 +6,20 @@ import { createClient } from '@/lib/supabase/server';
 
 export const maxDuration = 30;
 
+// Convert UIMessage format (from useChat v3) to ModelMessage format (for streamText)
+function convertMessages(uiMessages: Array<{ role: string; parts?: Array<{ type: string; text?: string }> }>) {
+    return uiMessages.map((msg) => ({
+        role: msg.role as 'user' | 'assistant',
+        content: msg.parts
+            ?.filter((p) => p.type === 'text' && p.text)
+            .map((p) => p.text!)
+            .join('') || '',
+    }));
+}
+
 export async function POST(req: Request) {
     try {
-        const { messages } = await req.json();
+        const { messages: uiMessages } = await req.json();
 
         const supabase = await createClient();
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -28,6 +39,9 @@ export async function POST(req: Request) {
         const history = await getPatientHistory(user.id);
         console.log('[chat] Patient history retrieved:', history ? 'yes' : 'no');
         const context = JSON.stringify(history, null, 2);
+
+        const messages = convertMessages(uiMessages);
+        console.log('[chat] Converted messages:', JSON.stringify(messages));
 
         console.log('[chat] Calling Gemini API...');
         const result = streamText({
