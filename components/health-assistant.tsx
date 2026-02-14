@@ -10,7 +10,7 @@ import { createClient } from '@/lib/supabase'
 export default function HealthAssistant() {
     const [isOpen, setIsOpen] = useState(false)
     const [isAuthenticated, setIsAuthenticated] = useState(false)
-    const { messages, sendMessage, status } = useChat()
+    const { messages, append, status } = useChat()
     const [input, setInput] = useState('')
     const isLoading = status === 'submitted' || status === 'streaming'
     const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -46,7 +46,7 @@ export default function HealthAssistant() {
         e.preventDefault()
         if (!input.trim()) return
 
-        await sendMessage({ text: input })
+        await append({ role: 'user', content: input })
         setInput('')
     }
 
