@@ -37,9 +37,9 @@ export default function InsightCard({ analysis, recommendations }: InsightCardPr
                         <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-200">Action Items</h4>
                         <ul className="space-y-2">
                             {recommendations.map((rec, i) => (
-                                <li key={i} className="flex items-start gap-3 bg-white/10 p-3 rounded-lg backdrop-blur-md">
+                                <li key={i} className="flex items-start gap-3 py-1">
                                     <CheckCircle2 className="w-5 h-5 text-green-300 shrink-0 mt-0.5" />
-                                    <span className="text-sm font-medium leading-relaxed shadow-sm">{rec}</span>
+                                    <span className="text-sm font-medium leading-relaxed">{rec}</span>
                                 </li>
                             ))}
                         </ul>

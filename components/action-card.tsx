@@ -21,7 +21,7 @@ export default function ActionCard({ recommendations }: ActionCardProps) {
 
                 <ul className="space-y-2">
                     {recommendations.map((rec, i) => (
-                        <li key={i} className="flex items-start gap-3 bg-white/10 p-3 rounded-lg backdrop-blur-sm">
+                        <li key={i} className="flex items-start gap-3 py-1">
                             <CheckCircle2 className="w-5 h-5 text-indigo-200 shrink-0 mt-0.5" />
                             <span className="text-sm font-medium leading-relaxed">{rec}</span>
                         </li>

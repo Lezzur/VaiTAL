@@ -65,7 +65,7 @@ export default function HealthAssistant() {
                 aria-label={isOpen ? 'Close Medical Assistant' : 'Open Medical Assistant'}
                 className={clsx(
                     "fixed bottom-6 right-6 p-4 rounded-full shadow-lg transition-all z-50 flex items-center gap-2",
-                    isOpen ? "bg-red-500 hover:bg-red-600 rotate-90" : "bg-blue-600 hover:bg-blue-700 hover:scale-110"
+                    isOpen ? "hidden" : "bg-blue-600 hover:bg-blue-700 hover:scale-110"
                 )}
             >
                 {isOpen ? (
@@ -80,7 +80,7 @@ export default function HealthAssistant() {
             {/* Chat Window */}
             <div
                 className={clsx(
-                    "fixed bottom-24 right-6 w-96 max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden transition-all duration-300 z-50 flex flex-col",
+                    "fixed bottom-6 right-6 w-96 max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden transition-all duration-300 z-50 flex flex-col",
                     isOpen ? "opacity-100 translate-y-0 h-[600px]" : "opacity-0 translate-y-10 pointer-events-none h-0"
                 )}
             >
@@ -98,8 +98,8 @@ export default function HealthAssistant() {
                             </p>
                         </div>
                     </div>
-                    <button onClick={() => setIsOpen(false)} aria-label="Minimize chat" className="hover:bg-white/20 p-1 rounded">
-                        <ChevronDown className="w-5 h-5" />
+                    <button onClick={() => setIsOpen(false)} aria-label="Close chat" className="hover:bg-white/20 p-1 rounded">
+                        <X className="w-5 h-5" />
                     </button>
                 </div>
 
