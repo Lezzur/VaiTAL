@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
-import { Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react'
+import { Mail, Lock, Loader2, Eye, EyeOff, CheckCircle } from 'lucide-react'
 
 export default function AuthForm() {
     const [email, setEmail] = useState('')
@@ -13,6 +13,7 @@ export default function AuthForm() {
     const [loading, setLoading] = useState(false)
     const [isSignUp, setIsSignUp] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [showConfirmation, setShowConfirmation] = useState(false)
 
     const router = useRouter()
     const supabase = createClient()
@@ -27,9 +28,12 @@ export default function AuthForm() {
                 const { error } = await supabase.auth.signUp({
                     email,
                     password,
+                    options: {
+                        emailRedirectTo: `${window.location.origin}/auth/callback`,
+                    },
                 })
                 if (error) throw error
-                alert('Check your email for the confirmation link!')
+                setShowConfirmation(true)
             } else {
                 const { error } = await supabase.auth.signInWithPassword({
                     email,
@@ -134,6 +138,30 @@ export default function AuthForm() {
                     {isSignUp ? 'Sign In' : 'Sign Up'}
                 </button>
             </div>
+
+            {showConfirmation && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setShowConfirmation(false)}>
+                    <div className="w-full max-w-sm mx-4 p-6 bg-white rounded-2xl shadow-xl border border-gray-100 space-y-4" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center shrink-0">
+                                <CheckCircle className="w-5 h-5 text-green-600" />
+                            </div>
+                            <div>
+                                <h2 className="text-lg font-semibold text-gray-900">Check Your Email</h2>
+                                <p className="text-sm text-gray-500">
+                                    We sent a confirmation link to <strong>{email}</strong>.
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => setShowConfirmation(false)}
+                            className="w-full py-2.5 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-all"
+                        >
+                            OK
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
